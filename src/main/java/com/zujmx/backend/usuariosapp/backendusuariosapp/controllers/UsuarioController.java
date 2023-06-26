@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +43,18 @@ public class UsuarioController {
     @PostMapping("/crear")
     public ResponseEntity<?> crear(@RequestBody Usuario usuario) {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.save(usuario));
+    }
+
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody Usuario usuario) {
+        Optional<Usuario> uOptional = usuarioService.findById(id);
+        if(uOptional.isPresent()) {
+            Usuario usuarioBD = uOptional.orElseThrow();
+            usuarioBD.setUsername(usuario.getUsername());
+            usuarioBD.setEmail(usuario.getEmail());
+            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.save(usuarioBD));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/genera/{cuantos}")
