@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,16 +31,21 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Usuario>> getById(@PathVariable Long id) {
-        Optional<Usuario> usuario = usuarioService.findById(id);
-        if(!usuario.isPresent()) {
-            return new ResponseEntity<>(usuario, HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> getById(@PathVariable(name = "id") Long id) {
+        Optional<Usuario> usuarioOptional = usuarioService.findById(id);
+        if(usuarioOptional.isPresent()) {
+            return ResponseEntity.ok(usuarioOptional.orElseThrow());
         }
-        return new ResponseEntity<>(usuario, HttpStatus.OK);
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/crear")
+    public ResponseEntity<?> crear(@RequestBody Usuario usuario) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.save(usuario));
     }
 
     @PostMapping("/genera/{cuantos}")
-    public String generaUsuarios(@PathVariable int cuantos) {
+    public String generaUsuarios(@PathVariable(name = "cuantos") int cuantos) {
         Faker faker = new Faker(new Locale("es-MX"));
         for (int i = 0; i < cuantos; i++) {
             Usuario usuario = new Usuario();
