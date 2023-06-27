@@ -23,7 +23,8 @@ import com.zujmx.backend.usuariosapp.backendusuariosapp.services.UsuarioService;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
-@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(originPatterns = "*")
 public class UsuarioController {
     
     @Autowired
