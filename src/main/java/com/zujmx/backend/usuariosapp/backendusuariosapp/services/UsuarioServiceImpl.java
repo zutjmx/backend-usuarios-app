@@ -39,5 +39,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     public void remove(Long id) {
         usuarioRepository.deleteById(id);
     }
-    
+
+    @Override
+    @Transactional
+    public Optional<Usuario> update(Usuario usuario, Long id) {
+        Optional<Usuario> uOptional = this.findById(id);
+        if(uOptional.isPresent()) {
+            Usuario usuarioBD = uOptional.orElseThrow();
+            usuarioBD.setUsername(usuario.getUsername());
+            usuarioBD.setEmail(usuario.getEmail());
+            return Optional.of(this.save(usuarioBD));
+        }
+        return Optional.empty();
+    }
+
 }

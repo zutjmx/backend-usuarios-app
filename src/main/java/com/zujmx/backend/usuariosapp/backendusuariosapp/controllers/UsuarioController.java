@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,16 +48,26 @@ public class UsuarioController {
 
     @PutMapping("/modificar/{id}")
     public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody Usuario usuario) {
-        Optional<Usuario> uOptional = usuarioService.findById(id);
+        Optional<Usuario> uOptional = usuarioService.update(usuario,id);
         if(uOptional.isPresent()) {
-            Usuario usuarioBD = uOptional.orElseThrow();
-            usuarioBD.setUsername(usuario.getUsername());
-            usuarioBD.setEmail(usuario.getEmail());
-            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.save(usuarioBD));
+            return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(uOptional.orElseThrow());
         }
         return ResponseEntity.notFound().build();
     }
 
+    @DeleteMapping("/borrar/{id}")
+    public ResponseEntity<?> borrar(@PathVariable Long id) {
+        Optional<Usuario> uOptional = usuarioService.findById(id);
+        if(uOptional.isPresent()) {
+            usuarioService.remove(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    //Método para generar e insertar datos en la tabla usuarios.
     @PostMapping("/genera/{cuantos}")
     public String generaUsuarios(@PathVariable(name = "cuantos") int cuantos) {
         Faker faker = new Faker(new Locale("es-MX"));
