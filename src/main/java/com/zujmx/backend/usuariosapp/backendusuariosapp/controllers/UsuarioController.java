@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.javafaker.Faker;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.Usuario;
+import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.UsuarioRequest;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.services.UsuarioService;
 
 import jakarta.validation.Valid;
@@ -61,7 +62,7 @@ public class UsuarioController {
 
     @PutMapping("/modificar/{id}")
     public ResponseEntity<?> modificar(@Valid @PathVariable Long id,         
-        @RequestBody Usuario usuario,
+        @RequestBody UsuarioRequest usuario,
         BindingResult result
     ) {
         if(result.hasErrors()) {

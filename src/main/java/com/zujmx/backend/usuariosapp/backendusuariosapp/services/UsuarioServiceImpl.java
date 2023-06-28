@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.Usuario;
+import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.UsuarioRequest;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.repositories.UsuarioRepository;
 
 @Service
@@ -42,7 +43,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
-    public Optional<Usuario> update(Usuario usuario, Long id) {
+    public Optional<Usuario> update(UsuarioRequest usuario, Long id) {
         Optional<Usuario> uOptional = this.findById(id);
         if(uOptional.isPresent()) {
             Usuario usuarioBD = uOptional.orElseThrow();
