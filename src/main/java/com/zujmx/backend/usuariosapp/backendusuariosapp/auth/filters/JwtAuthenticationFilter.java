@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.Usuario;
+import static com.zujmx.backend.usuariosapp.backendusuariosapp.auth.TokenJwtConfig.*;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -41,8 +42,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             usuario = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);
             username = usuario.getUsername();
             password = usuario.getPassword();
-            logger.info("username desde request: "+username);
-            logger.info("password desde request: "+password);
+            //logger.info("username desde request: "+username);
+            //logger.info("password desde request: "+password);
         } catch (StreamReadException e) {
             
             e.printStackTrace();
@@ -61,10 +62,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             Authentication authResult) throws IOException, ServletException {
         String username = ((User) authResult.getPrincipal()).getUsername();
-        String entradaOriginal = "token_con_frase_secreta." + username;
+        String entradaOriginal = SECRET_KEY + "." + username;
         String token = Base64.getEncoder().encodeToString(entradaOriginal.getBytes());
         logger.info("token generado: "+token);
-        response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
         Map<String, Object> body = new HashMap<>();
         body.put("token", token);
         body.put("mensaje", "Se inició sesión con éxito, usuario: " + username);

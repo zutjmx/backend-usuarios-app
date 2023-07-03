@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.zujmx.backend.usuariosapp.backendusuariosapp.auth.filters.JwtAuthenticationFilter;
+import com.zujmx.backend.usuariosapp.backendusuariosapp.auth.filters.JwtValidationFilter;
 
 @Configuration
 public class SpringSecurityConfig {
@@ -36,6 +37,7 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/listar").permitAll()
                 .anyRequest().authenticated())
                 .addFilter(new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()))
+                .addFilter(new JwtValidationFilter(authenticationConfiguration.getAuthenticationManager()))
                 .csrf(config -> config.disable())
                 .sessionManagement(managment -> managment.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
