@@ -2,7 +2,9 @@ package com.zujmx.backend.usuariosapp.backendusuariosapp.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -10,28 +12,40 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.Usuario;
+import com.zujmx.backend.usuariosapp.backendusuariosapp.repositories.UsuarioRepository;
 
 @Service
 public class JpaUserDetailsService implements UserDetailsService {
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if(!username.equals("zutjmx")) {            
+        
+        Optional<Usuario> uOptional = usuarioRepository.findByUsername(username);
+
+        if(!uOptional.isPresent()) {            
             throw new UsernameNotFoundException("El usuario: ".concat(username).concat(" no existe en el sistema")); 
         }
+
+        Usuario usuario = uOptional.orElseThrow();
 
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        // $2a$10$DOMDxjYyfZ/e7RcBfUpzqeaCs8pLgcizuiQWXPkU35nOhZlFcE9MS = 12345
         // $2a$12$6ODzlbsDTjIqXLFRtGwxEOt3PWYsCTkSlyXAhm1h.bdy3oMiAxoo6 = sistemas
-        return new User(username,
-              "$2a$12$6ODzlbsDTjIqXLFRtGwxEOt3PWYsCTkSlyXAhm1h.bdy3oMiAxoo6",
-              true,
-              true,
-              true,
-              true,
-              authorities);
+        return new User(usuario.getUsername(),
+            usuario.getPassword(),
+            true,
+            true,
+            true,
+            true,
+            authorities);
     }
     
 }
