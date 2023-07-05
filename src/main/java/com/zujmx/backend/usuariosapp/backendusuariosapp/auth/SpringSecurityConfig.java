@@ -35,6 +35,7 @@ public class SpringSecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.authorizeHttpRequests(authRules -> authRules
                 .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/listar").permitAll()
+                //.requestMatchers(HttpMethod.POST, "/api/v1/usuarios/crear").permitAll()
                 .anyRequest().authenticated())
                 .addFilter(new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()))
                 .addFilter(new JwtValidationFilter(authenticationConfiguration.getAuthenticationManager()))
