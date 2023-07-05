@@ -2,7 +2,6 @@ package com.zujmx.backend.usuariosapp.backendusuariosapp.auth.filters;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +14,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+
 import static com.zujmx.backend.usuariosapp.backendusuariosapp.auth.TokenJwtConfig.*;
 
 import jakarta.servlet.FilterChain;
@@ -40,36 +44,30 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
         }
         String token = header.replace(PREFIX_TOKEN, "");
 
-        System.out.println("token: ");
-        System.out.println(token);
+        try {
+            
+            Claims claims = Jwts.parserBuilder()
+                            .setSigningKey(SECRET_KEY)
+                            .build()
+                            .parseClaimsJws(token)
+                            .getBody();
 
-        byte[] tokenDecodeBytes = Base64.getDecoder().decode(token);
-        String tokenDecodeString = new String(tokenDecodeBytes);
+            String username = claims.getSubject();
 
-        System.out.println("tokenDecodeString: ");
-        System.out.println(tokenDecodeString);
-
-        String[] tokenArray = tokenDecodeString.split("\\.");
-
-        System.out.println("tokenArray.length: ");
-        System.out.println(tokenArray.length);
-
-        String secreto = tokenArray[0];
-        String username = tokenArray[1];
-        
-        if (SECRET_KEY.equals(secreto)) {
             List<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(request, response);
-        } else {
+        } catch (JwtException exception) {
             Map<String, String> body = new HashMap<>();
+            body.put("error", exception.getMessage());
             body.put("mensaje", "Invalid Token!");
             response.getWriter().write(new ObjectMapper().writeValueAsString(body));
             response.setStatus(403);
             response.setContentType("application/json");
         }
+        
     }
     
     

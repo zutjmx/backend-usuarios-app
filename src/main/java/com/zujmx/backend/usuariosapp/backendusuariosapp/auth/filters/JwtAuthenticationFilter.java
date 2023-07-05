@@ -1,7 +1,7 @@
 package com.zujmx.backend.usuariosapp.backendusuariosapp.auth.filters;
 
 import java.io.IOException;
-import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +16,9 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.Usuario;
+
+import io.jsonwebtoken.Jwts;
+
 import static com.zujmx.backend.usuariosapp.backendusuariosapp.auth.TokenJwtConfig.*;
 
 import jakarta.servlet.FilterChain;
@@ -62,8 +65,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             Authentication authResult) throws IOException, ServletException {
         String username = ((User) authResult.getPrincipal()).getUsername();
-        String entradaOriginal = SECRET_KEY + "." + username;
-        String token = Base64.getEncoder().encodeToString(entradaOriginal.getBytes());
+        
+        String token = Jwts.builder()
+                    .setSubject(username)
+                    .signWith(SECRET_KEY)
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(System.currentTimeMillis() + 3600000))
+                    .compact();
+
         logger.info("token generado: "+token);
         response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
         Map<String, Object> body = new HashMap<>();
