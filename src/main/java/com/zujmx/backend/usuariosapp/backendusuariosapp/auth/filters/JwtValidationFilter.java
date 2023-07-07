@@ -55,6 +55,9 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
 
             Object authoritiesClaims = claims.get("authorities");            
             String username = claims.getSubject();
+            Object usernameDos = claims.get("username");
+            System.out.println("username: " + username);
+            System.out.println("usernameDos: " + usernameDos);
 
             Collection<? extends GrantedAuthority> authorities = Arrays.asList(
                                                     new ObjectMapper()
