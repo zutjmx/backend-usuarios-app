@@ -5,21 +5,18 @@ import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.Usuario;
 
 public class DtoMapperUsuario {
 
-    private static DtoMapperUsuario mapper;
-
     private Usuario usuario;
 
     private DtoMapperUsuario() {
     }
     
     public static DtoMapperUsuario builder() {
-        mapper = new DtoMapperUsuario();
-        return mapper;
+        return new DtoMapperUsuario();
     }
 
     public DtoMapperUsuario setUsuario(Usuario usuario) {
         this.usuario = usuario;
-        return mapper;
+        return this;
     }
 
     public UsuarioDto build() {

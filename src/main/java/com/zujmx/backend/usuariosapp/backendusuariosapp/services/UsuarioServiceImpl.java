@@ -44,15 +44,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional(readOnly = true)
     public Optional<UsuarioDto> findById(Long id) {
-        Optional<Usuario> optional = usuarioRepository.findById(id);
-        if (optional.isPresent()) {
-            return Optional.of(
-                DtoMapperUsuario.builder()
-                .setUsuario(optional.orElseThrow())
-                .build()
-            );
-        }
-        return Optional.empty();
+        return usuarioRepository
+                .findById(id)
+                .map(u -> DtoMapperUsuario.builder().setUsuario(u).build());
+        
     }
 
     @Override
