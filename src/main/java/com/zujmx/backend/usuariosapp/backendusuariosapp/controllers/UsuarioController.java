@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.javafaker.Faker;
+import com.zujmx.backend.usuariosapp.backendusuariosapp.models.dto.UsuarioDto;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.Usuario;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.UsuarioRequest;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.services.UsuarioService;
@@ -37,13 +38,13 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @GetMapping("/listar")
-    public ResponseEntity<List<Usuario>> getAllUsuarios() {
+    public ResponseEntity<List<UsuarioDto>> getAllUsuarios() {
         return new ResponseEntity<>(usuarioService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable(name = "id") Long id) {
-        Optional<Usuario> usuarioOptional = usuarioService.findById(id);
+        Optional<UsuarioDto> usuarioOptional = usuarioService.findById(id);
         if(usuarioOptional.isPresent()) {
             return ResponseEntity.ok(usuarioOptional.orElseThrow());
         }
@@ -68,7 +69,7 @@ public class UsuarioController {
         if(result.hasErrors()) {
             return validacion(result);
         }
-        Optional<Usuario> uOptional = usuarioService.update(usuario,id);
+        Optional<UsuarioDto> uOptional = usuarioService.update(usuario,id);
         if(uOptional.isPresent()) {
             return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -79,7 +80,7 @@ public class UsuarioController {
 
     @DeleteMapping("/borrar/{id}")
     public ResponseEntity<?> borrar(@PathVariable Long id) {
-        Optional<Usuario> uOptional = usuarioService.findById(id);
+        Optional<UsuarioDto> uOptional = usuarioService.findById(id);
         if(uOptional.isPresent()) {
             usuarioService.remove(id);
             return ResponseEntity.noContent().build();
