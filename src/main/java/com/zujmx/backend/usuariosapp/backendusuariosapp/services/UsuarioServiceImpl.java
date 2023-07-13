@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.dto.UsuarioDto;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.dto.mapper.DtoMapperUsuario;
+import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.IUsuario;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.Role;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.Usuario;
 import com.zujmx.backend.usuariosapp.backendusuariosapp.models.entities.UsuarioRequest;
@@ -47,7 +48,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository
                 .findById(id)
                 .map(u -> DtoMapperUsuario.builder().setUsuario(u).build());
-        
+
     }
 
     @Override
@@ -55,14 +56,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioDto save(Usuario usuario) {
         String passwordCifrado = passwordEncoder.encode(usuario.getPassword());
         usuario.setPassword(passwordCifrado);
-
-        Optional<Role> rOptional = roleRepository.findByName("ROLE_USER");        
-        List<Role> roles = new ArrayList<>();
-        if(rOptional.isPresent()) {
-            roles.add(rOptional.orElseThrow());
-        }
-        usuario.setRoles(roles);
-
+        usuario.setRoles(asignaRoles(usuario));
         return DtoMapperUsuario.builder()
                 .setUsuario(usuarioRepository.save(usuario))
                 .build();
@@ -79,9 +73,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Optional<UsuarioDto> update(UsuarioRequest usuario, Long id) {
         Optional<Usuario> o = usuarioRepository.findById(id);
         Usuario usuarioOptional = null;
-        
-        if(o.isPresent()) {
+
+        if (o.isPresent()) {
             Usuario usuarioBD = o.orElseThrow();
+            usuarioBD.setRoles(asignaRoles(usuario));
             usuarioBD.setUsername(usuario.getUsername());
             usuarioBD.setEmail(usuario.getEmail());
             usuarioOptional = usuarioRepository.save(usuarioBD);
@@ -90,6 +85,22 @@ public class UsuarioServiceImpl implements UsuarioService {
         return Optional.ofNullable(DtoMapperUsuario.builder()
                 .setUsuario(usuarioOptional)
                 .build());
+    }
+
+    private List<Role> asignaRoles(IUsuario usuario) {
+        Optional<Role> rOptional = roleRepository.findByName("ROLE_USER");
+        List<Role> roles = new ArrayList<>();
+        if (rOptional.isPresent()) {
+            roles.add(rOptional.orElseThrow());
+        }
+
+        if (usuario.isAdmin()) {
+            Optional<Role> optionalAdmin = roleRepository.findByName("ROLE_ADMIN");
+            if (optionalAdmin.isPresent()) {
+                roles.add(optionalAdmin.orElseThrow());
+            }
+        }
+        return roles;
     }
 
 }

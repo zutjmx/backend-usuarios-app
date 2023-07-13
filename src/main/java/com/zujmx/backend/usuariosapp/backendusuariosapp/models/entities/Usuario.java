@@ -20,7 +20,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "usuarios")
-public class Usuario {
+public class Usuario implements IUsuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -89,6 +89,7 @@ public class Usuario {
         this.roles = roles;
     }
 
+    @Override
     public boolean isAdmin() {
         return admin;
     }
