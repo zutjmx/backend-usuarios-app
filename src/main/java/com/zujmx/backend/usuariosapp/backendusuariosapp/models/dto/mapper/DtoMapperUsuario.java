@@ -24,10 +24,13 @@ public class DtoMapperUsuario {
             throw  new RuntimeException("No se ha establecido el objeto de tipo 'Usuario'");
         }
 
+        boolean isAdmin = usuario.getRoles().stream().anyMatch(r -> "ROLE_ADMIN".equals(r.getName()));
+
         UsuarioDto usuarioDto = new UsuarioDto(
             this.usuario.getId(), 
             this.usuario.getUsername(), 
-            this.usuario.getEmail());
+            this.usuario.getEmail(), 
+            isAdmin);
 
         return usuarioDto;
     }
